@@ -1,0 +1,38 @@
+"Marketplace Performance Intelligence"
+
+Project Statement: The company's leadership wants to know how the business is really performing and what to fix first. Using one year-by-year dataset of real orders, students turn raw files into a clean data model, 9 dashboards, insights, and a storytelling presentation for management.
+
+Brief Project Idea:
+"We sell through a marketplace model: customers order, independent sellers ship, and we handle payments and customer experience. Leadership meets next month and I need to answer five things: 
+(1) Is revenue growing, and where does it come from? 
+(2) Which products and categories matter most? 
+(3) Who are our customers and do they come back? 
+(4) Are we delivering on time, and does late delivery hurt satisfaction? 
+(5) Which sellers and states need attention? 
+Please give me dashboards, the key insights, and a short story I can present, with clear recommendations."
+
+
+Dashboards to get created:
+
+Sales & Revenue: How much revenue per month? Growth month-over-month? Best weekday/hour? Average order value (AOV)?
+
+Products & Categories: Top 10 categories by revenue and by orders? Price vs freight cost? Which categories are growing or shrinking?
+
+Customers: How many unique customers? New vs repeat? Who are the best customers (RFM segments)?
+
+Delivery & Logistics: Average delivery days? On-time vs late %? Which states are slowest? How much late delivery per month?
+
+Customer Satisfaction: Average review score? Share of 1-star reviews? Does late delivery lower the score?
+
+Sellers: Top sellers by revenue? Sellers with the most late orders or worst reviews? How concentrated is revenue?
+
+Geography: Revenue and orders by state and city? Where do customers and sellers sit?
+
+Payments: Which payment types are most used? How many installments? Credit-card installment behavior by order value?
+
+Executive Summary: The 8–10 KPIs a CEO checks in 30 seconds.
+
+How to Collect the Data:
+Kaggle → https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
+
+

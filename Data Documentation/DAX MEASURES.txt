@@ -1,0 +1,60 @@
+PHASE 1: Problem Understanding
+PHASE 2: Data Collection
+PHASE 3: Data Understanding & Auditing
+PHASE 4: Data Cleaning
+PHASE 5: Data Transformation
+PHASE 6: Data Modelling
+PHASE 7: Data Analysis - DAX Measures
+PHASE 8: DASHBOARD DESIGNING
+PHASE 9: STORY TELLING
+
+
+Data Analysis - DAX Measures
+
+* Calculated Column: A Calculated Column is calculated once for every row and stored.
+* Measure: It is calculated live, for whatever the pivot table
+
+Previous Steps Before writing the DAX Measures
+
+P1: Orders: Calculate the valid_order, delay data
+
+P2: Order_Payment: We will create the groups for installment and Payment value
+
+P3: A customer level table for new VS repeat customers and RFM
+RFM (Recency, Frequency, Monetary)
+
+It is a customer segmentation technique in Data Analytics to understand the behaviour of the customer or the purchasing patterns of customer.
+
+Recency: Measure how recently a customer purchased something.
+
+Frequency: It measures how often a customer purchase something
+
+Monetary: Measures how much money a customer spends.
+
+Step 1: Create the Order_revenue table based on the order items table.
+-- We create one Order_revenue column by grouping all the order_id data.
+
+Step 2: Customer_Summary
+
+Step 3: RFM Columns: RFM answers the customer behaviour
+Recency: how recently did they buy?
+Frequency: how often they buy?
+Monetary: How much did they spent?
+
+
+P4: Create a relationship for new customers
+Calendar[Date] connect Customer_Summary[first_order_date]
+Relationship: one(Calendar[Date]) to many (Customer_Summary[first_order_date])
+
+P5: In calendar table create the Analysis Period column
+
+P6: Orders: Customer bridge: To count the customers within a period, we count unique people from orders
+
+P7: Sellers: Readable label: Create the seller_label column in that create the combination of seller_id + seller_city + seller_state.
+
+P8: A home for the measures
+The field list shows one tidy table called _Measures that holds only formulas.
+
+How to create the Measure
+-- 1. In the fields list right click on the _Measures then click on Add Measure.
+--  2. Enter the measure name, write down the formula set the category and also check the Dax formula.
