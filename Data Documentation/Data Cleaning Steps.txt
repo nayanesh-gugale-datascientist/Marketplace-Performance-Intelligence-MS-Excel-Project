@@ -1,0 +1,477 @@
+Part A: Power Query basics (explain once to students)
+
+Open a new Excel workbook, save it in 03_Workbook, then go to Data tab → Get Data → From File → From Text/CSV.
+
+Select the file and click Transform Data, not Load.
+Inside the Power Query Editor, turn on the profiling tools: View tab → tick Column quality, Column distribution, Column profile, and Formula Bar.
+At the bottom-left status bar, change “Column profiling based on top 1000 rows” to Column profiling based on entire data set. Otherwise your null and error counts will be wrong.
+The right-hand Applied Steps pane is a recorded list of everything you do. Rename important steps by right-clicking → Rename (for example “Removed duplicate reviews”) so the step list reads as documentation.
+When you finish a table, use Home → Close & Load To… → Only Create Connection + tick “Add this data to the Data Model”. Never load 100,000 rows onto a worksheet.
+
+------------------------------------------------------------------------------------------------------------
+
+Part B: The universal cleaning checklist
+
+Apply this to every table, in this order. Students should memorize it.
+
+Profile: check row count, nulls, errors and distinct counts.
+Rename the query (for example olist_orders_dataset → Orders).
+Set data types (Date/Time, Decimal Number, Whole Number, Text).
+Trim and Clean text: select columns → Transform → Format → Trim, then Clean.
+Fix text case: states in UPPER, cities in Capitalize Each Word.
+Handle nulls: decide to keep, fill, replace or remove, and log why.
+Remove duplicates: select the key column → Home → Remove Rows → Remove Duplicates.
+Check invalid values or outliers (negative prices, impossible dates).
+Remove columns you don’t need.
+Log it.
+
+------------------------------------------------------------------------------------------------------------
+
+1st Table: Data Cleaning on Orders table
+
+Step 1: Check the data types of all the columns
+
+1. Order_id, customer_id, order_status --> Text field
+2. Other than this 5 columns --> Date/Time Field
+
+Step 2: After this, look at the column quality on every column and confirm error = 0 %.
+
+Step 3: Trim and clean the text columns
+
+Step 4: Standardize the data
+
+Step 5: Check for duplicate data
+
+Step 6: Check/Review for the null Values
+-- order_approved_at - 160
+-- order_delivered_carrier_date - 1783
+-- order_delivered_customer_date - 2965
+
+-- Keep all of the null values which are present in the above columns because the fact is cancelled, Shipped, or processing order has no deliver date yet
+
+
+Step 7: Check the date logic: Always Check the sequences of the data & time column
+-- Dates should always follow the order: Purchase --> Approved --> Carrier Pickup --> Customer deliver
+
+-- 1. Approved date is less than the Purchase Date --> Ok
+-- 2. Carrier Pickup Date is less than the Purchase Date --> I found that there are 166 rows where Carrier Pickup Date is larger than the Purchase Date.
+
+-- 3. Customer deliver Date is less than the Purchase Date --> Ok
+
+-- 4. Customer deliver Date is less than the Carrier Pickup Date --> I found that there are 23 rows where Carrier Pickup Date is larger than the Customer deliver Date.
+
+
+Step 8: Check the Date Range: 
+
+Step 9: Review which columns to keep: For Orders table, all 8 columns will used, no columns will be deleted
+
+Step 10: Final error check and step names:
+-- Check error 0% on all cols.
+-- In Applied steps, right click on the important steps and rename it and set the appropriate name for the future understanding.
+
+Step 11: Close & Load the data to the Data model
+
+------------------------------------------------------------------------------------------------------------
+
+2nd Table: Data Cleaning on Customer Dataset
+
+Step 1: Load the data file and profile it and understand the total no of rows and columns.
+Total rows = 99,441
+Total Columns = 5
+
+Step 2: Rename the query of dataset
+
+Step 3: Set the proper data types to all the columns
+Set all the columns in the text data type.
+
+Step 4: Trim and clean the text columns
+
+Step5 : Standardize the customer_zip_code_prefix column
+
+Step 6: Standarize the customer_city & customer_state columns
+-- Sao Paulo --> Sa~, 0, Sao_Paulo
+-- You must check city names accent, writing patterns
+-- If you find any different accent or patterns for names then clean the data by replacing the proper values.
+
+-- State:
+-- 1. There should be no blank value, same case pattern for every state data like 2-letter typos, every data in upper case/lower case.
+
+Step 7: Clean customer_id & customer_unique_id
+
+customer_id is created fresh for every order, while customer_unique_id is the real person.
+Example: One person who orders 3 times gets 3 unique customer_id values but only one customer_unique_id.
+
+Also note that for every order there can be different cities or states
+
+Step 8: Check for null values
+
+Step 9: Review which columns to keep: For Customers table, All 5 columns will be keep
+
+Step 10: Final error check and step names:
+
+------------------------------------------------------------------------------------------------------------
+
+3rd Table: Data Cleaning on Orders Items Dataset
+
+
+Step 1: Load the data and profile it
+Total Rows: 112650
+Total Columns: 7
+
+Step 2: Rename the query
+
+Step 3: Set the proper data type for every column
+-- order_id, product_id, seller_id - Text
+-- order_item_id - Integer
+-- shipping_limit_date - Data & Time
+-- Price, freight_value - Decimal Value
+
+-- Step 4: Trim & Clean the data
+
+-- Step 5: Check the keys and Duplicate data
+
+The primary key must be set to the 2 columns order_id + order_item_id
+
+Step 6: Check for the null values
+
+Step 7: Validate the price
+-- Analysis: Read the min and max value
+-- Identify the top 5/10 products, lower 5/10 products
+-- Check that no price is 0 or negative --> If you found this type of data then delete that data or try to fix that data.
+
+Step 8: Validate the freight_value
+
+Step 9: Check the shipping_limit_date range
+
+Step 10: Review which columns to keep: For Orders Items table, All 7 columns will be keep
+
+
+Step 11: Final error check and step names
+
+Step 12: Load to the data model
+
+------------------------------------------------------------------------------------------------------------
+
+4th Table: Data Cleaning on Order Payments Dataset
+
+
+Step 1: Load the data and profile it
+Total Rows: 103886
+Total Columns: 5
+
+
+Step 2: Rename the query
+
+Step 3: Set the data types
+-- order_id, payment_type --> Text
+-- payment_sequential, payment_installments --> Integer
+-- payment_value --> Decimal value
+
+Step 4: Trim & clean the text data
+
+Step 5: Check the key & duplicates
+-- The primary key of this table is Order_id + Payment_sequential
+
+Step 6: Check for the null values
+
+Step 7: Validate Payment_type and remove the invalid value
+-- Boleto - 19,784
+-- Credit Card - 76,795
+-- Debit card - 1529
+-- Voucher - 5775
+-- Not defined - 3
+
+-- Total rows count - 103883
+
+Step 8: Standarize the payment type labels
+
+Step 9: Validate Payment_Installments
+-- Read min & Max value
+-- Payment must have atleast 1 installemnt
+
+744bade1fcf9ff3f31d860ace076d422 - Credit_Card
+1a57108394169c0b47d8f876acc9ba2d - Credit_Card
+
+Step 10: Validate Payment_Value
+-- Read the min and max value
+
+
+Step 11: Review which columns to keep: For Order Payments table, All 5 columns will be keep
+
+
+Step 11: Final error check and step names
+
+Step 12: Load to the data model
+
+
+------------------------------------------------------------------------------------------------------------
+
+5th Table: Data Cleaning on Order Reviews Dataset
+
+Step 1: Load the data and profile it
+Total Rows: 99224
+Total Columns: 7
+
+
+Step 2: Rename the query
+
+Step 3: Set the data types
+-- review_id, order_id, review_comment_title, review_comment_message --> Text
+-- review_score --> Integer
+-- review_creation_date, review_answer_timestamp - Date/Time
+
+Step 4: Trim and clean the text columns - ID columns
+
+Step 5: Check the key & duplicates
+-- The primary key of this table is 
+
+Step 6: Check for the null values
+
+Step 7: Validate Review_score
+-- Check the score must be between the 1 to 5
+
+Step 8: Create a "Has Comment" flag
+-- Understand the distribution About how many reviews are provided by the user.
+
+Step 9: Remove the comment text columns
+-- review_comment_title, review_comment_message
+
+Step 10: Check the date logic and range
+
+Step 11: Keep one review per order(the latest)
+-- 1. Same review id on different orders: We keep these rows because eac order needs its own review row.
+
+-- 2. Several reviews on 1 order: A customer reviewed the same order twice or edited it. For dashboards we need only one review per order.
+
+Step 11: Final error check and step names
+
+Step 12: Load to the data model
+
+------------------------------------------------------------------------------------------------------------
+6th Table: Data Cleaning on Products Dataset
+
+
+Step 1: Load the data and profile it
+Total Rows: 32,951
+Total Columns: 9
+
+Step 2: Rename the query
+
+Step 3: Review which columns to keep: For Products table:
+product_name_lenght, product_description_lenght, product_photos_qty - Delete
+
+product_id, product_category_name, product_weight_g, product_length_cm, product_height_cm, product_width_cm - Keep
+
+Total Columns: 6
+
+Step 4: Set the data types
+product_id, product_category_name - Text
+product_weight_g, product_length_cm, product_height_cm, product_width_cm - Integer
+
+Step 5: Trim and clean the text columns
+
+Step 6: Check the key & duplicates
+-- The Primary key for this table is Product_id.
+
+Step 7: Handle the Missing categories
+
+Step 8: Validate the category values
+
+Step 9: Handle the product_weight_g column
+-- Check null values: 2
+-- Try to fill that values: Don't fill with 0 weight
+-- Read min value: 0 Total zero count: 4
+-- Check the null values and also read the min value: Null Value count: 6
+
+Step 10: Validate the dimensions column
+-- Check null values:
+-- Read the min and max data 
+product_length_cm	2	7	105
+product_weight_g	2	2	105
+product_width_cm	2	6	118
+
+
+Step 11: Final error check and step names
+
+Step 12: Load to the data model
+
+------------------------------------------------------------------------------------------------------------
+7th Table: Data Cleaning on Sellers Dataset
+
+Step 1: Load the data and profile it
+Total Rows: 3,096
+Total Columns: 4
+
+Step 2: Rename the query
+
+Step 3: Set the data types
+seller_id,seller_zip_code_prefix, seller_city, seller_state - Text
+
+Step 4: Trim and Clean the data
+
+Step 5: Pad the zip code to 5 digits
+
+Step 6: Standardize and validate the state column
+
+Step 7: Convert the city to lowercase
+
+Step 8: Validate the Seller_city column
+-- Sao Paulo --> Sa~, 0, Sao_Paulo
+-- You must check city names accent, writing patterns
+-- If you find any different accent or patterns for names then clean the data by replacing the proper values.
+
+-- We found 1 City Name which is filled by 1 number
+
+-- Fix typos in the biggest number: Look at the top 10 to 20 cities
+Typos matter most in cities with many sellers, because they split one bar in a chart into two.
+
+Click seller_city and look at the Column profile panel under the data. It shows each value with its count.
+Look at the top 10 to 15 cities. Then use the dropdown search box to look for variants of each one. Start with paulo, rio, belo, curitiba, ribeirao, campinas, santo andre, and any large city in your own list.
+Look for entries that are clearly the same city with a spelling slip (for example sao paulop, scao paulo, ribeirao pretp, balenario camboriu).
+Fix each with Replace Values → Match entire cell contents, as in Step 9.
+Stop when the top cities look clean. We don’t chase every rare typo. For a city with one seller, an extra spelling variant changes nothing in the dashboards. Say this out loud to students: you fix what affects the answer, you document the rest, and you don’t aim for perfect.
+
+Step 9: Capitalize the city and recheck the count
+
+Select seller_city → Transform → Format → Capitalize Each Word.
+Click the column and read the Distinct count again. Compare it with Step 1 (about 611). It should now be lower, because variants have merged.
+Write down both numbers: before and after.
+
+Step 10: Check the key for duplicates
+
+Step 11: Check for nulls
+
+Step 12: Review which columns to keep
+
+Step 13: Final error check and step names
+
+Step 14: Load to the Data Model: Home → Close & Load dropdown → Close & Load To… → Only Create Connection + tick “Add this data to the Data Model” → OK. Confirm the count is 3,095.
+------------------------------------------------------------------------------------------------------------
+8th Table: Data Cleaning on Product Category Name Translation Dataset
+
+------------------------------------------------------------------------------------------------------------
+9th Table: Data Cleaning on Geolocation Dataset
+
+Step 1: Load the data and profile it
+Total Rows: 10,00,163
+Total Columns: 5
+
+Step 2: Rename the query
+
+Step 3: Set the proper data types
+geolocation_zip_code_prefix, geolocation_city, geolocation_state - Text
+geolocation_lat, geolocation_lng - Decimal Number
+
+Step 4: Trim & clean the text columns
+
+Step 5: Pad the Zip code to 5 digits
+
+-- Note: Step 1: Click the last steps in Applied steps, then click the fx button.
+Step 2: The formula bar will show: #"Trimeed Text"
+Step 3: Replace the above formula with this: = Table.TransformColumns(#"Trimmed Text", {{"geolocation_zip_code_prefix", each Text.PadStart(_, 5, "0"), type Text}})
+
+
+Step 6: Review the city and the state columns, then remove them
+
+Step 7: Check the coordinates and remove the points outside Brazil.
+-- read the Min and Max Value
+geolocation_lat : Min Value: -36.60537, Max Value: +45.065933
+geolocation_lng: Min Value: -101.466766, Max Value: +121.105393
+
+-- Rename the Applied Steps
+
+-- Total rows: 988476, Total Columns: 3
+
+Step 8: Check for the null values
+
+Step 9: Collpase to one row per zip prefix -- Implement this by using the Group By Clause
+
+Total Rows: 18,676
+
+Step 10: Round the Coordinates
+We will be rounding of the each value till the 6 digit.
+
+Step 11: Check the key for duplicates
+
+Step 12: Review which columns to keep
+
+Step 13: Final error check and step names
+
+Step 14: Load to the Data Model: Home → Close & Load dropdown → Close & Load To… → Only Create Connection + tick “Add this data to the Data Model” → OK. Confirm the count is 3,095.
+
+------------------------------------------------------------------------------------------------------------
+Data Transformation All Steps
+
+T1: Orders Table: Data Transformation
+1. Calculate Purchase_Date, Purchase_hour, Delivery Days, Delay Days, Delivery Status
+2. Data Quality Flag - 197 Records
+3. Bring the review score inside the order table
+
+T2: Orders_Item: Data Transformation
+
+1. Calculated the total amount for the every item.
+
+T3: Products: Data Transformation
+1. Add the English category name for the every product
+
+T4: State_Lookup: we will create a small table for the state names and the regions.
+
+T5: Customers & sellers: we will add the state names and regions
+-- Also we will add the Latitude and Longitude for every zip code.
+Customer Table: Empty Cells for the Latitude and Longitude are 1,414
+Seller Table: Empty Cells for the Latitude and Longitude are 14
+
+T6: Calendar table: Every time based on the dashboard needs a proper calendar: one row per day, with year, month, and weekday columns.
+
+T7: Check the every table must be present in the Data Model
+-- Remove the Tables from the Data Model: State_Lookup, Geolocation, Orders_Reviews, Category Translation
+
+T8: Checking the Keys inside the table
+-- Left Anti Join: A left anti join returns only those records from the first table that do not have a matching key in the second table.
+For every merge give the proper names
+
+
+------------------------------------------------------------------------------------------------------------
+Data Modelling:
+It is used to build the relationships between the 2 or many more tables.
+
+M1: Put all the required tables in the data model.
+Total 7 types of different tables which will be present in the data model
+Table Names: 
+
+M2: Open the data model --> Arrange all the tables in the diagram view.
+
+M3:  Model Settings
+-- 1. Sort Month Name and Weekday names correctly
+-- 2. Mark Calendar as the Date table.
+-- 3. Hide the technical Columns
+technical Columns clutter the field list and invite the mistakes
+
+Customer: Customer_id
+Products: Product_id
+Seller: Seller_id
+Orders: Order_Id, Customer_id
+Order_items: Customer_id, Product_id, Seller_id
+Order_Payments: Order_Id
+Calendar: Month Number, Weekday Number
+
+M4: Bridge the Columns for the seller dashboard(Your First DAX)
+Order_Items sits on the many side of orders, so it can look up the values from orders but the orders cannot see the seller filters.
+
+We are going to copy the 2 order column data.
+
+These columns is going to answer me: Which seller have the most late orders or worst review.
+
+M5: Test the Data Model
+Test No 1: Total Revenue
+
+Test No 2: Time Works
+
+Test No 3: Category Works
+
+Test No 4: State Works
+
+Test No 5: Payment Works
+ 
+Test No 6: Slicers
+
